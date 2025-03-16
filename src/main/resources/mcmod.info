@@ -1,0 +1,11 @@
+[
+{
+  "modid": "imindanger",
+  "name": "I'm In Danger!",
+  "description": "A minecraft mod that notifies you of bloodlust (tells you when something wants to kill you)",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "authorList": ["Laike_Endaril"],
+  "credits": ""
+}
+]
