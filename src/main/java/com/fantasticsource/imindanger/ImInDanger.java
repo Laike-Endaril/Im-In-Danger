@@ -79,7 +79,7 @@ public class ImInDanger
     @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
-        if (!MinecraftForge.EVENT_BUS.post(new DangerEvent(danger)))
+        if (clientInDanger != danger && !MinecraftForge.EVENT_BUS.post(new DangerEvent(danger)))
         {
             //TODO play sound
             //TODO show indicator
