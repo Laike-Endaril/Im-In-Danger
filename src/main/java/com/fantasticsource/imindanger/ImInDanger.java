@@ -174,6 +174,10 @@ public class ImInDanger
             if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
             lastFadeTrigger = 0;
         }
+        else
+        {
+            if (System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+        }
     }
 
     @SideOnly(Side.CLIENT)

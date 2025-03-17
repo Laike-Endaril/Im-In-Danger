@@ -11,6 +11,8 @@ imindanger.config.sound.alertVolume=Alert Volume
 imindanger.config.sound.alertVolume.tooltip=How loud the alert sound is\n\nWon't take effect until after the next time the sound stops\n \n
 imindanger.config.sound.heartbeatVolume=Heartbeat Volume
 imindanger.config.sound.heartbeatVolume.tooltip=How loud the heartbeat sound is\n\nWon't take effect until after the next time the sound stops\n \n
+imindanger.config.sound.maxHeartbeatDuration=Max Heartbeat Duration
+imindanger.config.sound.maxHeartbeatDuration.tooltip=Limits how long the heartbeat will play when in danger, in milliseconds; -1 means no limit, 1000 is 1 second
 
 imindanger.config.visuals.dangerIndicatorType=Danger Indicator Type
 imindanger.config.visuals.dangerIndicatorType.tooltip=What kind of danger indicator is shown when in danger\n0 = None\n1 = Regular Image\n \n

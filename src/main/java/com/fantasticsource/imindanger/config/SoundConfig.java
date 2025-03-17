@@ -24,4 +24,13 @@ public class SoundConfig
             })
     @Config.RangeDouble(min = 0, max = 1)
     public double heartbeatVolume = 1;
+
+    @Config.Name("030 Max Heartbeat Duration")
+    @Config.LangKey(ImInDanger.MODID + ".config.sound.maxHeartbeatDuration")
+    @Config.Comment(
+            {
+                    "Limits how long the heartbeat will play when in danger, in milliseconds; -1 means no limit, 1000 is 1 second"
+            })
+    @Config.RangeInt(min = -1)
+    public int maxHeartbeatDuration = -1;
 }
