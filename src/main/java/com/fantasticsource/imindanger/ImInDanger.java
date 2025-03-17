@@ -145,7 +145,7 @@ public class ImInDanger
             else
             {
                 //"Safe" trigger (client)
-                if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+                soundHandler.stopSound(heartbeatSound);
             }
 
             clientInDanger = danger;
@@ -163,7 +163,7 @@ public class ImInDanger
         if (Minecraft.getMinecraft().world == null)
         {
             setClientDanger(false);
-            if (soundHandler != null && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            if (soundHandler != null) soundHandler.stopSound(heartbeatSound);
             lastFadeTrigger = 0;
 
             alertSound = null;
