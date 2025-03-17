@@ -14,5 +14,7 @@ imindanger.config.sound.heartbeatVolume.tooltip=How loud the heartbeat sound is\
 
 imindanger.config.visuals.dangerIndicatorType=Danger Indicator Type
 imindanger.config.visuals.dangerIndicatorType.tooltip=What kind of danger indicator is shown when in danger\n0 = None\n1 = Regular Image\n \n
+imindanger.config.visuals.dangerIndicatorFadeInTime=Danger Indicator Fade-In Time
+imindanger.config.visuals.dangerIndicatorFadeInTime.tooltip=How long the danger indicator takes to fade in when danger is detected, in milliseconds (1000 = 1 second)
 imindanger.config.visuals.dangerIndicatorFadeTime=Danger Indicator Fade Time
 imindanger.config.visuals.dangerIndicatorFadeTime.tooltip=How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)
