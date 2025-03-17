@@ -1,5 +1,6 @@
 package com.fantasticsource.imindanger;
 
+import com.fantasticsource.imindanger.config.DangerConfig;
 import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
 import net.minecraft.client.Minecraft;
@@ -131,12 +132,12 @@ public class ImInDanger
 
                 if (!soundHandler.isSoundPlaying(alertSound))
                 {
-                    alertSound.volume = (float) DangerConfig.alertVolume;
+                    alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
                     if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
                 }
                 if (!soundHandler.isSoundPlaying(heartbeatSound))
                 {
-                    heartbeatSound.volume = (float) DangerConfig.heartbeatVolume;
+                    heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume;
                     soundHandler.playSound(heartbeatSound);
                 }
 

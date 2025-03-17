@@ -1,7 +1,18 @@
 imindanger.subtitles.alert=Alert
 imindanger.subtitles.heartbeat=Heartbeat
 
-imindanger.config.alertVolume=Alert Volume
-imindanger.config.alertVolume.tooltip=How loud the alert sound is\n\nWon't take effect until after the next time the sound stops\n \n
-imindanger.config.heartbeatVolume=Heartbeat Volume
-imindanger.config.heartbeatVolume.tooltip=How loud the heartbeat sound is\n\nWon't take effect until after the next time the sound stops\n \n
+
+
+
+imindanger.config.sound=Sound
+imindanger.config.visuals=Visuals
+
+imindanger.config.sound.alertVolume=Alert Volume
+imindanger.config.sound.alertVolume.tooltip=How loud the alert sound is\n\nWon't take effect until after the next time the sound stops\n \n
+imindanger.config.sound.heartbeatVolume=Heartbeat Volume
+imindanger.config.sound.heartbeatVolume.tooltip=How loud the heartbeat sound is\n\nWon't take effect until after the next time the sound stops\n \n
+
+imindanger.config.visuals.dangerIndicatorType=Danger Indicator Type
+imindanger.config.visuals.dangerIndicatorType.tooltip=What kind of danger indicator is shown when in danger\n0 = None\n1 = Regular Image\n \n
+imindanger.config.visuals.dangerIndicatorFadeTime=Danger Indicator Fade Time
+imindanger.config.visuals.dangerIndicatorFadeTime.tooltip=How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)
