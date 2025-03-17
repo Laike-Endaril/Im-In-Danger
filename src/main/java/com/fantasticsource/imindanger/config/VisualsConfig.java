@@ -23,5 +23,5 @@ public class VisualsConfig
                     "How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)"
             })
     @Config.RangeInt(min = 0)
-    public int dangerIndicatorFadeTime = 0;
+    public int dangerIndicatorFadeTime = 1000;
 }

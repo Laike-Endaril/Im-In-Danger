@@ -5,6 +5,7 @@ import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -29,12 +30,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+
 @Mod(modid = ImInDanger.MODID, name = ImInDanger.NAME, version = ImInDanger.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.050,)")
 public class ImInDanger
 {
     public static final String MODID = "imindanger";
     public static final String NAME = "I'm In Danger!";
     public static final String VERSION = "1.12.2.000";
+
+    private static final ResourceLocation DANGER_INDICATOR_TEXTURE = new ResourceLocation(MODID, "image/danger.png");
 
     public static final ResourceLocation
             ALERT_SOUND_RL = new ResourceLocation(MODID, "alert"),
@@ -140,13 +145,13 @@ public class ImInDanger
                     heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume;
                     soundHandler.playSound(heartbeatSound);
                 }
-
-                fadeStart = System.currentTimeMillis();
             }
             else
             {
                 //"Safe" trigger (client)
                 if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+
+                fadeStart = System.currentTimeMillis();
             }
 
             clientInDanger = danger;
@@ -172,10 +177,49 @@ public class ImInDanger
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void drawHUD(Render.RenderHUDEvent event)
     {
+        if (DangerConfig.visualSettings.dangerIndicatorType == 0) return;
+
+
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
+        GlStateManager.pushMatrix();
 
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        long time = System.currentTimeMillis();
+        switch (DangerConfig.visualSettings.dangerIndicatorType)
+        {
+            case 1:
+                if (!clientInDanger)
+                {
+                    if (fadeStart == 0 || time - fadeStart >= DangerConfig.visualSettings.dangerIndicatorFadeTime) break;
+                    GlStateManager.color(1, 1, 1, 1f - (float) (time - fadeStart) / DangerConfig.visualSettings.dangerIndicatorFadeTime);
+                }
 
+                GlStateManager.translate(sr.getScaledWidth() * 0.5, sr.getScaledHeight() * 0.8, 0);
+
+                float uvleft = 0;
+                float uvright = 1;
+                float uvtop = 0;
+                float uvbottom = 1;
+
+                Minecraft.getMinecraft().renderEngine.bindTexture(DANGER_INDICATOR_TEXTURE);
+
+                GlStateManager.glBegin(GL_QUADS);
+                GlStateManager.glTexCoord2f(uvleft, uvtop);
+                GlStateManager.glVertex3f(-8, -8, 0);
+                GlStateManager.glTexCoord2f(uvleft, uvbottom);
+                GlStateManager.glVertex3f(-8, 8, 0);
+                GlStateManager.glTexCoord2f(uvright, uvbottom);
+                GlStateManager.glVertex3f(8, 8, 0);
+                GlStateManager.glTexCoord2f(uvright, uvtop);
+                GlStateManager.glVertex3f(8, -8, 0);
+                GlStateManager.glEnd();
+
+                GlStateManager.color(1, 1, 1, 1);
+                break;
+        }
+
+        GlStateManager.popMatrix();
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
     }
