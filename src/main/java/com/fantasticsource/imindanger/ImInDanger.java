@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 
-@Mod(modid = ImInDanger.MODID, name = ImInDanger.NAME, version = ImInDanger.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.050,)")
+@Mod(modid = ImInDanger.MODID, name = ImInDanger.NAME, version = ImInDanger.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.051,)")
 public class ImInDanger
 {
     public static final String MODID = "imindanger";
@@ -131,12 +131,6 @@ public class ImInDanger
             if (danger)
             {
                 //"Alert" trigger (client)
-                if (alertSound == null)
-                {
-                    alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE);
-                    heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0);
-                }
-
                 if (!soundHandler.isSoundPlaying(alertSound))
                 {
                     alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
@@ -165,18 +159,25 @@ public class ImInDanger
     public static void clientTick(TickEvent.ClientTickEvent event)
     {
         SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
-        if (soundHandler == null || heartbeatSound == null) return;
-
 
         if (Minecraft.getMinecraft().world == null)
         {
             setClientDanger(false);
-            if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            if (soundHandler != null && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
             lastFadeTrigger = 0;
+
+            alertSound = null;
+            heartbeatSound = null;
         }
-        else
+        else if (alertSound == null)
         {
-            if (System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            if (soundHandler != null)
+            {
+                alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, Minecraft.getMinecraft().player);
+                heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, Minecraft.getMinecraft().player);
+
+                if (System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            }
         }
     }
 
