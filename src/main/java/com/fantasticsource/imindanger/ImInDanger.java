@@ -111,6 +111,8 @@ public class ImInDanger
     }
 
 
+    public static long fadeStart = 0;
+
     @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
@@ -118,9 +120,9 @@ public class ImInDanger
         {
             SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
 
-            //"Alert" and "Safe" triggers (client)
             if (danger)
             {
+                //"Alert" trigger (client)
                 if (alertSound == null)
                 {
                     alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE);
@@ -130,19 +132,21 @@ public class ImInDanger
                 if (!soundHandler.isSoundPlaying(alertSound))
                 {
                     alertSound.volume = (float) DangerConfig.alertVolume;
-                    soundHandler.playSound(alertSound);
+                    if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
                 }
                 if (!soundHandler.isSoundPlaying(heartbeatSound))
                 {
                     heartbeatSound.volume = (float) DangerConfig.heartbeatVolume;
                     soundHandler.playSound(heartbeatSound);
                 }
+
+                fadeStart = System.currentTimeMillis();
             }
             else
             {
+                //"Safe" trigger (client)
                 if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
             }
-            //TODO show indicator
 
             clientInDanger = danger;
         }
