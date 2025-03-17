@@ -32,9 +32,12 @@ public class ImInDanger
     public static final String NAME = "I'm In Danger!";
     public static final String VERSION = "1.12.2.000";
 
-    public static final ResourceLocation ALERT_SOUND_RL = new ResourceLocation(MODID, "alert");
-    public static final ResourceLocation HEARTBEAT_SOUND_RL = new ResourceLocation(MODID, "heartbeat");
-    public static final SoundEvent ALERT_SOUND_EVENT = new SoundEvent(ALERT_SOUND_RL).setRegistryName(ALERT_SOUND_RL), HEARTBEAT_SOUND_EVENT = new SoundEvent(HEARTBEAT_SOUND_RL).setRegistryName(HEARTBEAT_SOUND_RL);
+    public static final ResourceLocation
+            ALERT_SOUND_RL = new ResourceLocation(MODID, "alert"),
+            HEARTBEAT_SOUND_RL = new ResourceLocation(MODID, "heartbeat");
+    public static final SoundEvent
+            ALERT_SOUND_EVENT = new SoundEvent(ALERT_SOUND_RL).setRegistryName(ALERT_SOUND_RL),
+            HEARTBEAT_SOUND_EVENT = new SoundEvent(HEARTBEAT_SOUND_RL).setRegistryName(HEARTBEAT_SOUND_RL);
 
     public static SimpleSound alertSound = null, heartbeatSound = null;
 
@@ -106,13 +109,6 @@ public class ImInDanger
 
 
     @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event)
-    {
-        if (Minecraft.getMinecraft().world == null) setClientDanger(false);
-    }
-
-    @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
         if (clientInDanger != danger && !MinecraftForge.EVENT_BUS.post(new DangerEvent(danger)))
@@ -138,6 +134,21 @@ public class ImInDanger
             //TODO show indicator
 
             clientInDanger = danger;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void clientTick(TickEvent.ClientTickEvent event)
+    {
+        SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
+        if (soundHandler == null || heartbeatSound == null) return;
+
+
+        if (Minecraft.getMinecraft().world == null)
+        {
+            setClientDanger(false);
+            if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
         }
     }
 }
