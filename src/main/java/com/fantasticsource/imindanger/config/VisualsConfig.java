@@ -33,4 +33,22 @@ public class VisualsConfig
             })
     @Config.RangeInt(min = 0)
     public int dangerIndicatorFadeTime = 1000;
+
+    @Config.Name("030 Danger Indicator X Position")
+    @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorXPosition")
+    @Config.Comment(
+            {
+                    "The horizontal location of the danger indicator (0 = left, 0.5 = center, 1 = right)"
+            })
+    @Config.RangeDouble(min = 0, max = 1)
+    public double dangerIndicatorXPosition = 0.5;
+
+    @Config.Name("040 Danger Indicator Y Position")
+    @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorYPosition")
+    @Config.Comment(
+            {
+                    "The vertical location of the danger indicator (0 = top, 0.5 = center, 1 = bottom)"
+            })
+    @Config.RangeDouble(min = 0, max = 1)
+    public double dangerIndicatorYPosition = 0.8;
 }

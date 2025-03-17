@@ -18,3 +18,7 @@ imindanger.config.visuals.dangerIndicatorFadeInTime=Danger Indicator Fade-In Tim
 imindanger.config.visuals.dangerIndicatorFadeInTime.tooltip=How long the danger indicator takes to fade in when danger is detected, in milliseconds (1000 = 1 second)
 imindanger.config.visuals.dangerIndicatorFadeTime=Danger Indicator Fade Time
 imindanger.config.visuals.dangerIndicatorFadeTime.tooltip=How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)
+imindanger.config.visuals.dangerIndicatorXPosition=Danger Indicator X Position
+imindanger.config.visuals.dangerIndicatorXPosition.tooltip=The horizontal location of the danger indicator (0 = left, 0.5 = center, 1 = right)
+imindanger.config.visuals.dangerIndicatorYPosition=Danger Indicator Y Position
+imindanger.config.visuals.dangerIndicatorYPosition.tooltip=The vertical location of the danger indicator (0 = left, 0.5 = center, 1 = right)

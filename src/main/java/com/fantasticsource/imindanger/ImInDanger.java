@@ -206,7 +206,7 @@ public class ImInDanger
 
                 GlStateManager.color(1, 1, 1, alpha);
 
-                GlStateManager.translate(sr.getScaledWidth() * 0.5, sr.getScaledHeight() * 0.8, 0);
+                GlStateManager.translate(8 + (sr.getScaledWidth() - 16) * DangerConfig.visualSettings.dangerIndicatorXPosition, 8 + (sr.getScaledHeight() - 16) * DangerConfig.visualSettings.dangerIndicatorYPosition, 0);
 
                 float uvleft = 0;
                 float uvright = 1;
