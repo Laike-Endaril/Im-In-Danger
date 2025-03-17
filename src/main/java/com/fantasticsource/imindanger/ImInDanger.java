@@ -132,16 +132,8 @@ public class ImInDanger
             if (danger)
             {
                 //"Alert" trigger (client)
-                if (!soundHandler.isSoundPlaying(alertSound))
-                {
-                    alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
-                    if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
-                }
-                if (!soundHandler.isSoundPlaying(heartbeatSound))
-                {
-                    heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume;
-                    soundHandler.playSound(heartbeatSound);
-                }
+                if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
+                if (!soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.playSound(heartbeatSound);
             }
             else
             {
@@ -175,16 +167,38 @@ public class ImInDanger
         {
             if (alertSound == null)
             {
+                alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+                heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+
+                //Preload sound data
+                soundHandler.playSound(alertSound);
+                soundHandler.stopSound(alertSound);
+                soundHandler.playSound(heartbeatSound);
+                soundHandler.stopSound(heartbeatSound);
+
                 alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, Minecraft.getMinecraft().player);
                 heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, Minecraft.getMinecraft().player);
             }
+
+            alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 
             if (dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime >= DangerConfig.dangerSmoothing)
             {
                 setClientDanger(false);
             }
-
-            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration) soundHandler.stopSound(heartbeatSound);
+            else if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration)
+            {
+                soundHandler.stopSound(heartbeatSound);
+            }
+            else if (System.currentTimeMillis() - lastFadeTrigger >= DangerConfig.soundSettings.quietHeartbeatDelay)
+            {
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume;
+                if (heartbeatSound.volume == 0) soundHandler.stopSound(heartbeatSound);
+            }
+            else
+            {
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume;
+            }
         }
     }
 
