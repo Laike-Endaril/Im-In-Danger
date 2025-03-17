@@ -12,6 +12,8 @@ imindanger.config.dangerSmoothing.tooltip=How long you need to be out of combat 
 
 imindanger.config.server.sneakyEntities=Sneaky Entities
 imindanger.config.server.sneakyEntities.tooltip=Entities that won't trigger the danger mode (good for surprise attack entities), eg...\nminecraft:skeleton
+imindanger.config.server.sneakyPotions=Sneaky Potions
+imindanger.config.server.sneakyPotions.tooltip=If an entity has one of these potions active, they will not trigger the danger mode, eg...\nminecraft:invisibility
 
 imindanger.config.sound.alertVolume=Alert Volume
 imindanger.config.sound.alertVolume.tooltip=How loud the alert sound is

@@ -13,4 +13,13 @@ public class ServerConfig
                     "minecraft:skeleton"
             })
     public String[] sneakyEntities = new String[]{};
+
+    @Config.Name("070 Sneaky Potions")
+    @Config.LangKey(ImInDanger.MODID + ".config.sneakyPotions")
+    @Config.Comment(
+            {
+                    "If an entity has one of these potions active, they will not trigger the danger mode, eg...",
+                    "minecraft:invisibility"
+            })
+    public String[] sneakyPotions = {};
 }

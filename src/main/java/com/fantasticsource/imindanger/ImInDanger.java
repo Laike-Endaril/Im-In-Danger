@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -91,8 +92,26 @@ public class ImInDanger
             if (entity instanceof EntityLiving && (rl == null || !Tools.contains(DangerConfig.serverSettings.sneakyEntities, rl.toString())))
             {
                 EntityLiving attacker = (EntityLiving) entity;
+                boolean found = false;
+                for (String string : DangerConfig.serverSettings.sneakyPotions)
+                {
+                    Potion sneakyPotion = Potion.REGISTRY.getObject(new ResourceLocation(string));
+                    {
+                        for (Potion potion : attacker.getActivePotionMap().keySet())
+                        {
+                            if (potion == sneakyPotion)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                }
+
+
                 EntityLivingBase target = attacker.getAttackTarget();
-                if (target instanceof EntityPlayerMP)
+                if (!found && target instanceof EntityPlayerMP)
                 {
                     EntityPlayerMP player = (EntityPlayerMP) target;
                     if (!inDangerPlayersNew.contains(player))
