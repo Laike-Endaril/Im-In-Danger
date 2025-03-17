@@ -37,7 +37,7 @@ public class ImInDanger
 {
     public static final String MODID = "imindanger";
     public static final String NAME = "I'm In Danger!";
-    public static final String VERSION = "1.12.2.000";
+    public static final String VERSION = "1.12.2.001";
 
     private static final ResourceLocation DANGER_INDICATOR_TEXTURE = new ResourceLocation(MODID, "image/danger.png");
 
