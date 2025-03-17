@@ -1,8 +1,10 @@
 package com.fantasticsource.imindanger;
 
+import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,6 +19,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -124,8 +127,16 @@ public class ImInDanger
                     heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0);
                 }
 
-                if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
-                if (!soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.playSound(heartbeatSound);
+                if (!soundHandler.isSoundPlaying(alertSound))
+                {
+                    alertSound.volume = (float) DangerConfig.alertVolume;
+                    soundHandler.playSound(alertSound);
+                }
+                if (!soundHandler.isSoundPlaying(heartbeatSound))
+                {
+                    heartbeatSound.volume = (float) DangerConfig.heartbeatVolume;
+                    soundHandler.playSound(heartbeatSound);
+                }
             }
             else
             {
@@ -150,5 +161,17 @@ public class ImInDanger
             setClientDanger(false);
             if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void drawHUD(Render.RenderHUDEvent event)
+    {
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+
+
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
     }
 }

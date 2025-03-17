@@ -1,2 +1,7 @@
 imindanger.subtitles.alert=Alert
 imindanger.subtitles.heartbeat=Heartbeat
+
+imindanger.config.alertVolume=Alert Volume
+imindanger.config.alertVolume.tooltip=How loud the alert sound is\n\nWon't take effect until after the next time the sound stops\n \n
+imindanger.config.heartbeatVolume=Heartbeat Volume
+imindanger.config.heartbeatVolume.tooltip=How loud the heartbeat sound is\n\nWon't take effect until after the next time the sound stops\n \n
