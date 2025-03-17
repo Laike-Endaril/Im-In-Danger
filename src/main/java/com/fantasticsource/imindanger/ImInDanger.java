@@ -9,6 +9,7 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -86,7 +87,8 @@ public class ImInDanger
 
         for (Entity entity : event.world.loadedEntityList)
         {
-            if (entity instanceof EntityLiving)
+            ResourceLocation rl = EntityList.getKey(entity);
+            if (entity instanceof EntityLiving && (rl == null || !Tools.contains(DangerConfig.serverSettings.sneakyEntities, rl.toString())))
             {
                 EntityLiving attacker = (EntityLiving) entity;
                 EntityLivingBase target = attacker.getAttackTarget();

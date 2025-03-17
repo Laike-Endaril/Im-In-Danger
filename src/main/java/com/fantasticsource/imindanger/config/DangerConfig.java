@@ -16,6 +16,11 @@ public class DangerConfig
     @Config.RangeInt(min = 0)
     public static int dangerSmoothing = 5000;
 
+
+    @Config.Name("Server")
+    @Config.LangKey(ImInDanger.MODID + ".config.server")
+    public static ServerConfig serverSettings = new ServerConfig();
+
     @Config.Name("Sound")
     @Config.LangKey(ImInDanger.MODID + ".config.sound")
     public static SoundConfig soundSettings = new SoundConfig();
