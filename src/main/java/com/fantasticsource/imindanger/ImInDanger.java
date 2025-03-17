@@ -3,6 +3,7 @@ package com.fantasticsource.imindanger;
 import com.fantasticsource.imindanger.config.DangerConfig;
 import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.ScaledResolution;
@@ -117,7 +118,8 @@ public class ImInDanger
     }
 
 
-    public static long fadeStart = 0;
+    public static long lastFadeTrigger = 0;
+    public static float lastAlpha = 0, lastFadeTriggerAlpha = 0;
 
     @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
@@ -150,11 +152,11 @@ public class ImInDanger
             {
                 //"Safe" trigger (client)
                 if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
-
-                fadeStart = System.currentTimeMillis();
             }
 
             clientInDanger = danger;
+            lastFadeTrigger = System.currentTimeMillis();
+            lastFadeTriggerAlpha = lastAlpha;
         }
     }
 
@@ -170,6 +172,7 @@ public class ImInDanger
         {
             setClientDanger(false);
             if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            lastFadeTrigger = 0;
         }
     }
 
@@ -189,11 +192,19 @@ public class ImInDanger
         switch (DangerConfig.visualSettings.dangerIndicatorType)
         {
             case 1:
-                if (!clientInDanger)
-                {
-                    if (fadeStart == 0 || time - fadeStart >= DangerConfig.visualSettings.dangerIndicatorFadeTime) break;
-                    GlStateManager.color(1, 1, 1, 1f - (float) (time - fadeStart) / DangerConfig.visualSettings.dangerIndicatorFadeTime);
-                }
+                if (lastFadeTrigger == 0) break;
+
+
+                float alpha;
+                if (clientInDanger) alpha = lastFadeTriggerAlpha + (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeInTime;
+                else alpha = lastFadeTriggerAlpha - (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeTime;
+
+                alpha = Tools.min(Tools.max(alpha, 0), 1);
+                lastAlpha = alpha;
+                if (alpha == 0) break;
+
+
+                GlStateManager.color(1, 1, 1, alpha);
 
                 GlStateManager.translate(sr.getScaledWidth() * 0.5, sr.getScaledHeight() * 0.8, 0);
 
