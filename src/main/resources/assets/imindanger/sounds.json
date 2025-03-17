@@ -1,0 +1,14 @@
+{
+    "alert": {
+        "sounds": [
+            "imindanger:alert"
+        ],
+        "subtitle": "imindanger.subtitles.alert"
+    },
+    "heartbeat": {
+        "sounds": [
+            "imindanger:heartbeat"
+        ],
+        "subtitle": "imindanger.subtitles.heartbeat"
+    }
+}

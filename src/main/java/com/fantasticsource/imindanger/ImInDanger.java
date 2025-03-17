@@ -1,17 +1,25 @@
 package com.fantasticsource.imindanger;
 
+import com.fantasticsource.mctools.sound.SimpleSound;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -23,6 +31,13 @@ public class ImInDanger
     public static final String MODID = "imindanger";
     public static final String NAME = "I'm In Danger!";
     public static final String VERSION = "1.12.2.000";
+
+    public static final ResourceLocation ALERT_SOUND_RL = new ResourceLocation(MODID, "alert");
+    public static final ResourceLocation HEARTBEAT_SOUND_RL = new ResourceLocation(MODID, "heartbeat");
+    public static final SoundEvent ALERT_SOUND_EVENT = new SoundEvent(ALERT_SOUND_RL).setRegistryName(ALERT_SOUND_RL), HEARTBEAT_SOUND_EVENT = new SoundEvent(HEARTBEAT_SOUND_RL).setRegistryName(HEARTBEAT_SOUND_RL);
+
+    public static SimpleSound alertSound = null, heartbeatSound = null;
+
 
     public static boolean clientInDanger = false;
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
@@ -38,6 +53,12 @@ public class ImInDanger
     public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public static void soundRegistry(RegistryEvent.Register<SoundEvent> event)
+    {
+        ForgeRegistries.SOUND_EVENTS.registerAll(ALERT_SOUND_EVENT, HEARTBEAT_SOUND_EVENT);
     }
 
 
@@ -61,7 +82,11 @@ public class ImInDanger
                     if (!inDangerPlayersNew.contains(player))
                     {
                         inDangerPlayersNew.add(player);
-                        if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker))) Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
+                        if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker)))
+                        {
+                            //"Alert" trigger (server)
+                            Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
+                        }
                     }
                 }
             }
@@ -69,7 +94,11 @@ public class ImInDanger
 
         for (EntityPlayerMP player : inDangerPlayers)
         {
-            if (!inDangerPlayersNew.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent(player, null))) Network.WRAPPER.sendTo(new Network.DangerPacket(false), player);
+            if (!inDangerPlayersNew.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent(player, null)))
+            {
+                //"Safe" trigger (server)
+                Network.WRAPPER.sendTo(new Network.DangerPacket(false), player);
+            }
         }
 
         inDangerPlayers = inDangerPlayersNew;
@@ -77,13 +106,38 @@ public class ImInDanger
 
 
     @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void clientTick(TickEvent.ClientTickEvent event)
+    {
+        if (Minecraft.getMinecraft().world == null) setClientDanger(false);
+    }
+
+    @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
         if (clientInDanger != danger && !MinecraftForge.EVENT_BUS.post(new DangerEvent(danger)))
         {
-            //TODO play sound
+            SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
+
+            //"Alert" and "Safe" triggers (client)
+            if (danger)
+            {
+                if (alertSound == null)
+                {
+                    alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE);
+                    heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0);
+                }
+
+                if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
+                if (!soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.playSound(heartbeatSound);
+            }
+            else
+            {
+                if (soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
+            }
             //TODO show indicator
-            System.out.println(danger);
+
+            clientInDanger = danger;
         }
     }
 }
