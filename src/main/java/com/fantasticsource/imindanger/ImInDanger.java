@@ -53,6 +53,7 @@ public class ImInDanger
 
 
     public static boolean clientInDanger = false;
+    public static long dangerSmoothingStartTime = 0;
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
 
     @Mod.EventHandler
@@ -146,6 +147,7 @@ public class ImInDanger
             {
                 //"Safe" trigger (client)
                 soundHandler.stopSound(heartbeatSound);
+                dangerSmoothingStartTime = 0;
             }
 
             clientInDanger = danger;
@@ -163,21 +165,26 @@ public class ImInDanger
         if (Minecraft.getMinecraft().world == null)
         {
             setClientDanger(false);
-            if (soundHandler != null) soundHandler.stopSound(heartbeatSound);
+            soundHandler.stopSound(heartbeatSound);
             lastFadeTrigger = 0;
 
             alertSound = null;
             heartbeatSound = null;
         }
-        else if (alertSound == null)
+        else
         {
-            if (soundHandler != null)
+            if (alertSound == null)
             {
                 alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, Minecraft.getMinecraft().player);
                 heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, Minecraft.getMinecraft().player);
-
-                if (System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration && soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.stopSound(heartbeatSound);
             }
+
+            if (dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime >= DangerConfig.dangerSmoothing)
+            {
+                setClientDanger(false);
+            }
+
+            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration) soundHandler.stopSound(heartbeatSound);
         }
     }
 

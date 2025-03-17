@@ -55,7 +55,15 @@ public class Network
         @SideOnly(Side.CLIENT)
         public IMessage onMessage(DangerPacket packet, MessageContext ctx)
         {
-            Minecraft.getMinecraft().addScheduledTask(() -> ImInDanger.setClientDanger(packet.danger));
+            Minecraft.getMinecraft().addScheduledTask(() ->
+            {
+                if (packet.danger)
+                {
+                    ImInDanger.dangerSmoothingStartTime = 0;
+                    ImInDanger.setClientDanger(packet.danger);
+                }
+                else ImInDanger.dangerSmoothingStartTime = System.currentTimeMillis();
+            });
             return null;
         }
     }

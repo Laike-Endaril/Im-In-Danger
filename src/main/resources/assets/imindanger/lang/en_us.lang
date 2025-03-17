@@ -6,6 +6,8 @@ imindanger.subtitles.heartbeat=Heartbeat
 
 imindanger.config.sound=Sound
 imindanger.config.visuals=Visuals
+imindanger.config.dangerSmoothing=Danger Smoothing
+imindanger.config.dangerSmoothing.tooltip=How long you need to be out of combat before indicators fade and sounds stop, in milliseconds (1000 = 1 second)\nThis can help prevent repeated alarm sounds and restarting heartbeats
 
 imindanger.config.sound.alertVolume=Alert Volume
 imindanger.config.sound.alertVolume.tooltip=How loud the alert sound is\n\nWon't take effect until after the next time the sound stops\n \n
