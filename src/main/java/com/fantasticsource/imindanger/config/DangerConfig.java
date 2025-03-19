@@ -14,7 +14,7 @@ public class DangerConfig
                     "This can help prevent repeated alarm sounds and restarting heartbeats"
             })
     @Config.RangeInt(min = 0)
-    public static int dangerSmoothing = 5000;
+    public static int dangerSmoothing = 0;
 
 
     @Config.Name("Server")
