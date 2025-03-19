@@ -16,24 +16,6 @@ public class VisualsConfig
     @Config.RangeInt(min = 0, max = 1)
     public int dangerIndicatorType = 1;
 
-    @Config.Name("017 Danger Indicator Fade-In Time")
-    @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorFadeInTime")
-    @Config.Comment(
-            {
-                    "How long the danger indicator takes to fade in when danger is detected, in milliseconds (1000 = 1 second)"
-            })
-    @Config.RangeInt(min = 0)
-    public int dangerIndicatorFadeInTime = 0;
-
-    @Config.Name("020 Danger Indicator Fade Time")
-    @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorFadeTime")
-    @Config.Comment(
-            {
-                    "How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)"
-            })
-    @Config.RangeInt(min = 0)
-    public int dangerIndicatorFadeTime = 1000;
-
     @Config.Name("030 Danger Indicator X Position")
     @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorXPosition")
     @Config.Comment(

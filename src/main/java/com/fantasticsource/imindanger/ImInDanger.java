@@ -1,6 +1,7 @@
 package com.fantasticsource.imindanger;
 
 import com.fantasticsource.imindanger.config.DangerConfig;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
 import com.fantasticsource.tools.Tools;
@@ -19,10 +20,13 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -33,6 +37,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
@@ -66,8 +71,30 @@ public class ImInDanger
 
 
     @Mod.EventHandler
-    public static void preInit(FMLPreInitializationEvent event)
+    public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException
     {
+        File configFile = new File(Loader.instance().getConfigDir().getAbsolutePath() + File.separator + MODID + ".cfg");
+        Configuration config = new Configuration(configFile);
+        ConfigCategory category = config.getCategory("general");
+        category.remove("050 Danger Smoothing");
+        category.remove("050 Danger Smoothing Fade");
+        category = config.getCategory("general.visuals");
+        if (category.containsKey("017 Danger Indicator Fade-In Time"))
+        {
+            config.getCategory("general").get("030 Danger Fade-In Time").set(category.get("017 Danger Indicator Fade-In Time").getInt());
+            category.remove("017 Danger Indicator Fade-In Time");
+        }
+        if (category.containsKey("020 Danger Indicator Fade Time"))
+        {
+            config.getCategory("general").get("040 Danger Fade-Out Time").set(category.get("020 Danger Indicator Fade Time").getInt());
+            category.remove("020 Danger Indicator Fade Time");
+        }
+        config.save();
+        MCTools.reloadConfig(configFile.getAbsolutePath(), MODID);
+        //TODO add setting for minimum time between alarms
+        //TODO make hearbeat duration / quiet mode be based on last time alarm went off
+
+
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
         Network.init();
     }
@@ -171,20 +198,16 @@ public class ImInDanger
     @SideOnly(Side.CLIENT)
     public static float currentDangerIntensity()
     {
-        //TODO replace indicator fade settings with danger fade settings
-        //TODO add setting for minimum time between alarms
-        //TODO make hearbeat duration / quiet mode be based on last time alarm went off
-        //TODO remove old config settings from config file via code (see ConfigHandler class in DS)
         if (lastDangerStartTime == 0) return 0;
 
         if (lastDangerStartTime > lastDangerEndTime)
         {
-            if (DangerConfig.visualSettings.dangerIndicatorFadeInTime == 0) return 1;
-            return Tools.min(1, lastTickIntensity + 50f / DangerConfig.visualSettings.dangerIndicatorFadeInTime); // 1000 millis/s / 20ticks/s = 50 = 50millis/tick
+            if (DangerConfig.dangerIndicatorFadeInTime == 0) return 1;
+            return Tools.min(1, lastTickIntensity + 50f / DangerConfig.dangerIndicatorFadeInTime); // 1000 millis/s / 20ticks/s = 50 = 50millis/tick
         }
 
-        if (DangerConfig.visualSettings.dangerIndicatorFadeTime == 0) return 0;
-        return Tools.max(0, lastTickIntensity - 50f / DangerConfig.visualSettings.dangerIndicatorFadeTime); // 1000 millis/s / 20ticks/s = 50millis/tick
+        if (DangerConfig.dangerIndicatorFadeOutTime == 0) return 0;
+        return Tools.max(0, lastTickIntensity - 50f / DangerConfig.dangerIndicatorFadeOutTime); // 1000 millis/s / 20ticks/s = 50millis/tick
     }
 
     @SideOnly(Side.CLIENT)

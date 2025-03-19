@@ -7,6 +7,10 @@ imindanger.subtitles.heartbeat=Heartbeat
 imindanger.config.server=Server
 imindanger.config.sound=Sound
 imindanger.config.visuals=Visuals
+imindanger.config.dangerFadeInTime=Danger Fade-In Time
+imindanger.config.dangerFadeInTime.tooltip=How long the danger indicator and heartbeat take to fade in when danger is detected, in milliseconds (1000 = 1 second)
+imindanger.config.dangerFadeOutTime=Danger Fade-Out Time
+imindanger.config.dangerFadeOutTime.tooltip=How long the danger indicator and heartbeat take to fade out when no danger is detected, in milliseconds (1000 = 1 second)
 
 
 imindanger.config.server.sneakyEntities=Sneaky Entities
@@ -27,10 +31,6 @@ imindanger.config.sound.maxHeartbeatDuration.tooltip=Limits how long the heartbe
 
 imindanger.config.visuals.dangerIndicatorType=Danger Indicator Type
 imindanger.config.visuals.dangerIndicatorType.tooltip=What kind of danger indicator is shown when in danger\n0 = None\n1 = Regular Image
-imindanger.config.visuals.dangerIndicatorFadeInTime=Danger Indicator Fade-In Time
-imindanger.config.visuals.dangerIndicatorFadeInTime.tooltip=How long the danger indicator takes to fade in when danger is detected, in milliseconds (1000 = 1 second)
-imindanger.config.visuals.dangerIndicatorFadeTime=Danger Indicator Fade Time
-imindanger.config.visuals.dangerIndicatorFadeTime.tooltip=How long the danger indicator takes to fade away once danger has passed, in milliseconds (1000 = 1 second)
 imindanger.config.visuals.dangerIndicatorXPosition=Danger Indicator X Position
 imindanger.config.visuals.dangerIndicatorXPosition.tooltip=The horizontal location of the danger indicator (0 = left, 0.5 = center, 1 = right)
 imindanger.config.visuals.dangerIndicatorYPosition=Danger Indicator Y Position
