@@ -64,7 +64,7 @@ public class ImInDanger
     public static boolean clientInDanger = false;
 
 
-    public static long lastDangerStartTime = 0, lastDangerEndTime = 0;
+    public static long lastDangerStartTime = 0, lastDangerEndTime = 0, lastAlarmTime = 0;
     public static float lastTickIntensity = 0;
 
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
@@ -91,8 +91,6 @@ public class ImInDanger
         }
         config.save();
         MCTools.reloadConfig(configFile.getAbsolutePath(), MODID);
-        //TODO add setting for minimum time between alarms
-        //TODO make hearbeat duration / quiet mode be based on last time alarm went off
 
 
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
@@ -222,10 +220,11 @@ public class ImInDanger
                 //"Alert" trigger (client)
                 lastDangerStartTime = System.currentTimeMillis();
 
-                if (!soundHandler.isSoundPlaying(alertSound) && lastTickIntensity == 0)
+                if (!soundHandler.isSoundPlaying(alertSound) && lastTickIntensity == 0 && System.currentTimeMillis() - lastAlarmTime >= DangerConfig.soundSettings.minTimeBetweenAlarms)
                 {
                     alertSound.volume = 1;
                     soundHandler.playSound(alertSound);
+                    lastAlarmTime = System.currentTimeMillis();
                 }
                 if (!soundHandler.isSoundPlaying(heartbeatSound))
                 {
@@ -272,6 +271,7 @@ public class ImInDanger
 
             alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 
+            //TODO make hearbeat duration / quiet mode be based on last time intensity went from 0 to non-0
             if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastDangerStartTime > DangerConfig.soundSettings.maxHeartbeatDuration)
             {
                 soundHandler.stopSound(heartbeatSound);

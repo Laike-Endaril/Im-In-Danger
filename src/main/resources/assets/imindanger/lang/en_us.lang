@@ -20,6 +20,8 @@ imindanger.config.server.sneakyPotions.tooltip=If an entity has one of these pot
 
 imindanger.config.sound.alertVolume=Alert Volume
 imindanger.config.sound.alertVolume.tooltip=How loud the alert sound is
+imindanger.config.sound.minTimeBetweenAlarms=Minimum Time Between Alarms
+imindanger.config.sound.minTimeBetweenAlarms.tooltip=After the alarm sound plays, at least this much time needs to go by before it can play again, in milliseconds (1000 = 1 second)
 imindanger.config.sound.heartbeatVolume=Heartbeat Volume
 imindanger.config.sound.heartbeatVolume.tooltip=How loud the heartbeat sound is
 imindanger.config.sound.quietHeartbeatDelay=Quiet Heartbeat Delay
