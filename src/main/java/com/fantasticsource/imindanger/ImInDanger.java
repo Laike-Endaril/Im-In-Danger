@@ -57,8 +57,13 @@ public class ImInDanger
 
 
     public static boolean clientInDanger = false;
-    public static long dangerSmoothingStartTime = 0, lastFadeTrigger = 0, lastAlarmTime = 0;
-    public static float lastIntensity = 0, lastFadeTriggerIntensity = 0;
+
+
+    //TODO calculate current intensity based only on first 2, the current time, and configs
+    public static long lastDangerStartTime = 0, lastDangerEndTime = 0;
+    //TODO not feasible for partial intensity should be sustained due to having fade-in and fade-out times and going in and out of combat rapidly
+    public static float lastTickIntensity = 0;
+    //TODO but it should be doable with these 4
 
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
 
@@ -111,6 +116,9 @@ public class ImInDanger
 
         for (Entity entity : event.world.loadedEntityList)
         {
+            if (!entity.isEntityAlive()) continue;
+
+
             ResourceLocation rl = EntityList.getKey(entity);
             if (entity instanceof EntityLiving && (rl == null || !Tools.contains(DangerConfig.serverSettings.sneakyEntities, rl.toString())))
             {
@@ -139,10 +147,10 @@ public class ImInDanger
                     EntityPlayerMP player = (EntityPlayerMP) target;
                     if (!inDangerPlayersNew.contains(player))
                     {
+                        inDangerPlayersNew.add(player);
                         if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker)))
                         {
                             //"Alert" trigger (server)
-                            inDangerPlayersNew.add(player);
                             Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
                         }
                     }
@@ -164,9 +172,19 @@ public class ImInDanger
 
 
     @SideOnly(Side.CLIENT)
-    public static boolean dangerSmoothingActive()
+    public static float currentDangerIntensity()
     {
-        return dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime < DangerConfig.dangerSmoothing;
+        //TODO account for lastTickIntensity
+        if (lastDangerStartTime == 0) return 0;
+
+        if (lastDangerStartTime > lastDangerEndTime)
+        {
+            if (DangerConfig.visualSettings.dangerIndicatorFadeInTime == 0) return 1;
+            return Tools.min(1, (float) (System.currentTimeMillis() - lastDangerStartTime) / DangerConfig.visualSettings.dangerIndicatorFadeInTime);
+        }
+
+        if (DangerConfig.visualSettings.dangerIndicatorFadeTime == 0) return 0;
+        return Tools.max(0, 1f - (float) (System.currentTimeMillis() - lastDangerEndTime) / DangerConfig.visualSettings.dangerIndicatorFadeTime);
     }
 
     @SideOnly(Side.CLIENT)
@@ -179,11 +197,12 @@ public class ImInDanger
             if (danger)
             {
                 //"Alert" trigger (client)
-                if (!soundHandler.isSoundPlaying(alertSound) && lastIntensity == 0)
+                lastDangerStartTime = System.currentTimeMillis();
+
+                if (!soundHandler.isSoundPlaying(alertSound) && lastTickIntensity == 0)
                 {
                     alertSound.volume = 1;
                     soundHandler.playSound(alertSound);
-                    lastAlarmTime = System.currentTimeMillis();
                 }
                 if (!soundHandler.isSoundPlaying(heartbeatSound))
                 {
@@ -194,13 +213,10 @@ public class ImInDanger
             else
             {
                 //"Safe" trigger (client)
-                ImInDanger.dangerSmoothingStartTime = System.currentTimeMillis();
+                lastDangerEndTime = System.currentTimeMillis();
             }
 
-            dangerSmoothingStartTime = 0;
             clientInDanger = danger;
-            lastFadeTrigger = System.currentTimeMillis();
-            lastFadeTriggerIntensity = lastIntensity;
         }
     }
 
@@ -215,11 +231,8 @@ public class ImInDanger
             setClientDanger(false);
             soundHandler.stopSound(alertSound);
             soundHandler.stopSound(heartbeatSound);
-            dangerSmoothingStartTime = 0;
-            lastFadeTrigger = 0;
-            lastAlarmTime = 0;
-            lastIntensity = 0;
-            lastFadeTriggerIntensity = 0;
+            lastDangerStartTime = 0;
+            lastTickIntensity = 0;
             alertSound = null;
             heartbeatSound = null;
         }
@@ -232,22 +245,21 @@ public class ImInDanger
             }
 
 
-            if (dangerSmoothingStartTime != 0 && !dangerSmoothingActive()) setClientDanger(false);
-
+            lastTickIntensity = currentDangerIntensity();
 
             alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 
-            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastAlarmTime > DangerConfig.soundSettings.maxHeartbeatDuration)
+            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastDangerStartTime > DangerConfig.soundSettings.maxHeartbeatDuration)
             {
                 soundHandler.stopSound(heartbeatSound);
             }
-            else if (System.currentTimeMillis() - lastAlarmTime >= DangerConfig.soundSettings.quietHeartbeatDelay)
+            else if (System.currentTimeMillis() - lastDangerStartTime >= DangerConfig.soundSettings.quietHeartbeatDelay)
             {
-                heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume * lastIntensity;
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume * lastTickIntensity;
             }
             else
             {
-                heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume * lastIntensity;
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume * lastTickIntensity;
             }
         }
     }
@@ -256,32 +268,21 @@ public class ImInDanger
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void drawHUD(Render.RenderHUDEvent event)
     {
-        if (DangerConfig.visualSettings.dangerIndicatorType == 0) return;
+        if (DangerConfig.visualSettings.dangerIndicatorType == 0 || lastDangerStartTime == 0) return;
+        float alpha = currentDangerIntensity();
+        if (alpha == 0) return;
 
 
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
         GlStateManager.pushMatrix();
+        GlStateManager.color(1, 1, 1, alpha);
+
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-        long time = System.currentTimeMillis();
         switch (DangerConfig.visualSettings.dangerIndicatorType)
         {
             case 1:
-                if (lastFadeTrigger == 0) break;
-
-
-                float alpha;
-                if (clientInDanger) alpha = lastFadeTriggerIntensity + (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeInTime;
-                else alpha = lastFadeTriggerIntensity - (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeTime;
-
-                alpha = Tools.min(Tools.max(alpha, 0), 1);
-                lastIntensity = alpha;
-                if (alpha == 0) break;
-
-
-                GlStateManager.color(1, 1, 1, alpha);
-
                 float size = (float) (16 * DangerConfig.visualSettings.dangerIndicatorScale), halfSize = size * 0.5f;
                 GlStateManager.translate(halfSize + (sr.getScaledWidth() - size) * DangerConfig.visualSettings.dangerIndicatorXPosition, halfSize + (sr.getScaledHeight() - size) * DangerConfig.visualSettings.dangerIndicatorYPosition, 0);
 
@@ -303,10 +304,11 @@ public class ImInDanger
                 GlStateManager.glVertex3f(halfSize, -halfSize, 0);
                 GlStateManager.glEnd();
 
-                GlStateManager.color(1, 1, 1, 1);
                 break;
         }
 
+
+        GlStateManager.color(1, 1, 1, 1);
         GlStateManager.popMatrix();
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
