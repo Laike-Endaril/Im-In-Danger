@@ -59,11 +59,8 @@ public class ImInDanger
     public static boolean clientInDanger = false;
 
 
-    //TODO calculate current intensity based only on first 2, the current time, and configs
     public static long lastDangerStartTime = 0, lastDangerEndTime = 0;
-    //TODO not feasible for partial intensity should be sustained due to having fade-in and fade-out times and going in and out of combat rapidly
     public static float lastTickIntensity = 0;
-    //TODO but it should be doable with these 4
 
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
 
@@ -174,7 +171,10 @@ public class ImInDanger
     @SideOnly(Side.CLIENT)
     public static float currentDangerIntensity()
     {
-        //TODO account for danger smoothing (both modes)
+        //TODO replace indicator fade settings with danger fade settings
+        //TODO add setting for minimum time between alarms
+        //TODO make hearbeat duration / quiet mode be based on last time alarm went off
+        //TODO remove old config settings from config file via code (see ConfigHandler class in DS)
         if (lastDangerStartTime == 0) return 0;
 
         if (lastDangerStartTime > lastDangerEndTime)
