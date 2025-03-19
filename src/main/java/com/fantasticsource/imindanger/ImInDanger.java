@@ -57,16 +57,16 @@ public class ImInDanger
             ALERT_SOUND_EVENT = new SoundEvent(ALERT_SOUND_RL).setRegistryName(ALERT_SOUND_RL),
             HEARTBEAT_SOUND_EVENT = new SoundEvent(HEARTBEAT_SOUND_RL).setRegistryName(HEARTBEAT_SOUND_RL);
 
-    public static SimpleSound alertSound = null, heartbeatSound = null;
 
+    public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
+
+
+    public static SimpleSound alertSound = null, heartbeatSound = null;
 
     public static boolean clientInDanger = false;
 
-
-    public static long lastDangerStartTime = 0, lastDangerEndTime = 0, lastAlarmTime = 0;
+    public static long lastDangerStartTime = 0, lastDangerEndTime = 0, lastAlarmTime = 0, lastIntensity0ToNon0Time = 0;
     public static float lastTickIntensity = 0;
-
-    public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
 
 
     @Mod.EventHandler
@@ -248,10 +248,16 @@ public class ImInDanger
         if (Minecraft.getMinecraft().world == null)
         {
             setClientDanger(false);
-            soundHandler.stopSound(alertSound);
-            soundHandler.stopSound(heartbeatSound);
+
             lastDangerStartTime = 0;
             lastTickIntensity = 0;
+            lastAlarmTime = 0;
+            lastIntensity0ToNon0Time = 0;
+
+            lastTickIntensity = 0;
+
+            soundHandler.stopSound(alertSound);
+            soundHandler.stopSound(heartbeatSound);
             alertSound = null;
             heartbeatSound = null;
         }
@@ -264,16 +270,17 @@ public class ImInDanger
             }
 
 
+            boolean lastWas0 = lastTickIntensity == 0;
             lastTickIntensity = currentDangerIntensity();
+            if (lastWas0 && lastTickIntensity != 0) lastIntensity0ToNon0Time = System.currentTimeMillis();
 
             alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 
-            //TODO make hearbeat duration / quiet mode be based on last time intensity went from 0 to non-0
-            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastDangerStartTime > DangerConfig.soundSettings.maxHeartbeatDuration)
+            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastIntensity0ToNon0Time > DangerConfig.soundSettings.maxHeartbeatDuration)
             {
                 soundHandler.stopSound(heartbeatSound);
             }
-            else if (System.currentTimeMillis() - lastDangerStartTime >= DangerConfig.soundSettings.quietHeartbeatDelay)
+            else if (System.currentTimeMillis() - lastIntensity0ToNon0Time >= DangerConfig.soundSettings.quietHeartbeatDelay)
             {
                 heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume * lastTickIntensity;
             }
@@ -288,7 +295,7 @@ public class ImInDanger
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void drawHUD(Render.RenderHUDEvent event)
     {
-        if (DangerConfig.visualSettings.dangerIndicatorType == 0 || lastDangerStartTime == 0) return;
+        if (DangerConfig.visualSettings.dangerIndicatorType == 0 || lastTickIntensity == 0) return;
         float alpha = currentDangerIntensity();
         if (alpha == 0) return;
 
