@@ -22,7 +22,9 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -55,14 +57,35 @@ public class ImInDanger
 
 
     public static boolean clientInDanger = false;
-    public static long dangerSmoothingStartTime = 0;
+    public static long dangerSmoothingStartTime = 0, lastFadeTrigger = 0, lastAlarmTime = 0;
+    public static float lastIntensity = 0, lastFadeTriggerIntensity = 0;
+
     public static ArrayList<EntityPlayerMP> inDangerPlayers = new ArrayList<>();
+
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
         Network.init();
+    }
+
+    @Mod.EventHandler
+    public static void postInit(FMLPostInitializationEvent event)
+    {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        {
+            //Preload sound data
+            SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
+            alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+            heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+            soundHandler.playSound(alertSound);
+            soundHandler.stopSound(alertSound);
+            soundHandler.playSound(heartbeatSound);
+            soundHandler.stopSound(heartbeatSound);
+            alertSound = null;
+            heartbeatSound = null;
+        }
     }
 
     @SubscribeEvent
@@ -140,9 +163,6 @@ public class ImInDanger
     }
 
 
-    public static long lastFadeTrigger = 0;
-    public static float lastAlpha = 0, lastFadeTriggerAlpha = 0;
-
     @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
@@ -153,19 +173,27 @@ public class ImInDanger
             if (danger)
             {
                 //"Alert" trigger (client)
-                if (!soundHandler.isSoundPlaying(alertSound)) soundHandler.playSound(alertSound);
-                if (!soundHandler.isSoundPlaying(heartbeatSound)) soundHandler.playSound(heartbeatSound);
+                if (!soundHandler.isSoundPlaying(alertSound) && lastIntensity == 0)
+                {
+                    alertSound.volume = 1;
+                    soundHandler.playSound(alertSound);
+                    lastAlarmTime = System.currentTimeMillis();
+                }
+                if (!soundHandler.isSoundPlaying(heartbeatSound))
+                {
+                    heartbeatSound.volume = 0.001f;
+                    soundHandler.playSound(heartbeatSound);
+                }
             }
             else
             {
                 //"Safe" trigger (client)
-                soundHandler.stopSound(heartbeatSound);
                 dangerSmoothingStartTime = 0;
             }
 
             clientInDanger = danger;
             lastFadeTrigger = System.currentTimeMillis();
-            lastFadeTriggerAlpha = lastAlpha;
+            lastFadeTriggerIntensity = lastIntensity;
         }
     }
 
@@ -178,8 +206,13 @@ public class ImInDanger
         if (Minecraft.getMinecraft().world == null)
         {
             setClientDanger(false);
+            soundHandler.stopSound(alertSound);
             soundHandler.stopSound(heartbeatSound);
+            dangerSmoothingStartTime = 0;
             lastFadeTrigger = 0;
+            lastAlarmTime = 0;
+            lastIntensity = 0;
+            lastFadeTriggerIntensity = 0;
 
             alertSound = null;
             heartbeatSound = null;
@@ -188,15 +221,6 @@ public class ImInDanger
         {
             if (alertSound == null)
             {
-                alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
-                heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
-
-                //Preload sound data
-                soundHandler.playSound(alertSound);
-                soundHandler.stopSound(alertSound);
-                soundHandler.playSound(heartbeatSound);
-                soundHandler.stopSound(heartbeatSound);
-
                 alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, Minecraft.getMinecraft().player);
                 heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, Minecraft.getMinecraft().player);
             }
@@ -207,18 +231,17 @@ public class ImInDanger
             {
                 setClientDanger(false);
             }
-            else if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastFadeTrigger > DangerConfig.soundSettings.maxHeartbeatDuration)
+            else if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastAlarmTime > DangerConfig.soundSettings.maxHeartbeatDuration)
             {
                 soundHandler.stopSound(heartbeatSound);
             }
-            else if (System.currentTimeMillis() - lastFadeTrigger >= DangerConfig.soundSettings.quietHeartbeatDelay)
+            else if (System.currentTimeMillis() - lastAlarmTime >= DangerConfig.soundSettings.quietHeartbeatDelay)
             {
-                heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume;
-                if (heartbeatSound.volume == 0) soundHandler.stopSound(heartbeatSound);
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.quietHeartbeatVolume * lastIntensity;
             }
             else
             {
-                heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume;
+                heartbeatSound.volume = (float) DangerConfig.soundSettings.heartbeatVolume * lastIntensity;
             }
         }
     }
@@ -243,11 +266,11 @@ public class ImInDanger
 
 
                 float alpha;
-                if (clientInDanger) alpha = lastFadeTriggerAlpha + (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeInTime;
-                else alpha = lastFadeTriggerAlpha - (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeTime;
+                if (clientInDanger) alpha = lastFadeTriggerIntensity + (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeInTime;
+                else alpha = lastFadeTriggerIntensity - (float) (time - lastFadeTrigger) / DangerConfig.visualSettings.dangerIndicatorFadeTime;
 
                 alpha = Tools.min(Tools.max(alpha, 0), 1);
-                lastAlpha = alpha;
+                lastIntensity = alpha;
                 if (alpha == 0) break;
 
 

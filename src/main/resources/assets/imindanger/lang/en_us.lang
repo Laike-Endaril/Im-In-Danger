@@ -9,6 +9,9 @@ imindanger.config.sound=Sound
 imindanger.config.visuals=Visuals
 imindanger.config.dangerSmoothing=Danger Smoothing
 imindanger.config.dangerSmoothing.tooltip=How long you need to be out of combat before indicators fade and sounds stop, in milliseconds (1000 = 1 second)\nThis can help prevent repeated alarm sounds and restarting heartbeats
+imindanger.config.dangerSmoothingFade=Danger Smoothing Fade
+imindanger.config.dangerSmoothingFade.tooltip=\nIf true, heartbeat and indicator fade even during danger smoothing, but if combat is re-entered during smoothing, the alarm still doesn't sound and the heartbeat timers continue from where they were instead of restarting\n\nIf false, heartbeat and indicator continue as if still in danger until the danger smoothing timer runs out, then fade\n
+
 
 imindanger.config.server.sneakyEntities=Sneaky Entities
 imindanger.config.server.sneakyEntities.tooltip=Entities that won't trigger the danger mode (good for surprise attack entities), eg...\nminecraft:skeleton
