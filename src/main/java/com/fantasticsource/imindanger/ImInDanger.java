@@ -164,6 +164,12 @@ public class ImInDanger
 
 
     @SideOnly(Side.CLIENT)
+    public static boolean dangerSmoothingActive()
+    {
+        return dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime < DangerConfig.dangerSmoothing;
+    }
+
+    @SideOnly(Side.CLIENT)
     public static void setClientDanger(boolean danger)
     {
         if (clientInDanger != danger && !MinecraftForge.EVENT_BUS.post(new DangerEvent(danger)))
@@ -188,9 +194,10 @@ public class ImInDanger
             else
             {
                 //"Safe" trigger (client)
-                dangerSmoothingStartTime = 0;
+                ImInDanger.dangerSmoothingStartTime = System.currentTimeMillis();
             }
 
+            dangerSmoothingStartTime = 0;
             clientInDanger = danger;
             lastFadeTrigger = System.currentTimeMillis();
             lastFadeTriggerIntensity = lastIntensity;
@@ -225,10 +232,7 @@ public class ImInDanger
             }
 
 
-            if (dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime >= DangerConfig.dangerSmoothing)
-            {
-                setClientDanger(false);
-            }
+            if (dangerSmoothingStartTime != 0 && !dangerSmoothingActive()) setClientDanger(false);
 
 
             alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
