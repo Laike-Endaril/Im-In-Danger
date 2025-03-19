@@ -139,10 +139,10 @@ public class ImInDanger
                     EntityPlayerMP player = (EntityPlayerMP) target;
                     if (!inDangerPlayersNew.contains(player))
                     {
-                        inDangerPlayersNew.add(player);
                         if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker)))
                         {
                             //"Alert" trigger (server)
+                            inDangerPlayersNew.add(player);
                             Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
                         }
                     }
