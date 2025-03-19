@@ -174,17 +174,17 @@ public class ImInDanger
     @SideOnly(Side.CLIENT)
     public static float currentDangerIntensity()
     {
-        //TODO account for lastTickIntensity
+        //TODO account for danger smoothing (both modes)
         if (lastDangerStartTime == 0) return 0;
 
         if (lastDangerStartTime > lastDangerEndTime)
         {
             if (DangerConfig.visualSettings.dangerIndicatorFadeInTime == 0) return 1;
-            return Tools.min(1, (float) (System.currentTimeMillis() - lastDangerStartTime) / DangerConfig.visualSettings.dangerIndicatorFadeInTime);
+            return Tools.min(1, lastTickIntensity + 50f / DangerConfig.visualSettings.dangerIndicatorFadeInTime); // 1000 millis/s / 20ticks/s = 50 = 50millis/tick
         }
 
         if (DangerConfig.visualSettings.dangerIndicatorFadeTime == 0) return 0;
-        return Tools.max(0, 1f - (float) (System.currentTimeMillis() - lastDangerEndTime) / DangerConfig.visualSettings.dangerIndicatorFadeTime);
+        return Tools.max(0, lastTickIntensity - 50f / DangerConfig.visualSettings.dangerIndicatorFadeTime); // 1000 millis/s / 20ticks/s = 50millis/tick
     }
 
     @SideOnly(Side.CLIENT)
