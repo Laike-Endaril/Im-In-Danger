@@ -213,7 +213,6 @@ public class ImInDanger
             lastAlarmTime = 0;
             lastIntensity = 0;
             lastFadeTriggerIntensity = 0;
-
             alertSound = null;
             heartbeatSound = null;
         }
@@ -225,13 +224,16 @@ public class ImInDanger
                 heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, Minecraft.getMinecraft().player);
             }
 
-            alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 
             if (dangerSmoothingStartTime != 0 && System.currentTimeMillis() - dangerSmoothingStartTime >= DangerConfig.dangerSmoothing)
             {
                 setClientDanger(false);
             }
-            else if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastAlarmTime > DangerConfig.soundSettings.maxHeartbeatDuration)
+
+
+            alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
+
+            if (DangerConfig.soundSettings.maxHeartbeatDuration != -1 && System.currentTimeMillis() - lastAlarmTime > DangerConfig.soundSettings.maxHeartbeatDuration)
             {
                 soundHandler.stopSound(heartbeatSound);
             }
