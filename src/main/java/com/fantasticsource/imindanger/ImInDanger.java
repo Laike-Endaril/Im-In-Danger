@@ -25,7 +25,6 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -97,22 +96,20 @@ public class ImInDanger
         Network.init();
     }
 
+    @SideOnly(Side.CLIENT)
     @Mod.EventHandler
     public static void postInit(FMLPostInitializationEvent event)
     {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-        {
-            //Preload sound data
-            SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
-            alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
-            heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
-            soundHandler.playSound(alertSound);
-            soundHandler.stopSound(alertSound);
-            soundHandler.playSound(heartbeatSound);
-            soundHandler.stopSound(heartbeatSound);
-            alertSound = null;
-            heartbeatSound = null;
-        }
+        //Preload sound data
+        SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
+        alertSound = new SimpleSound(ALERT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+        heartbeatSound = new SimpleSound(HEARTBEAT_SOUND_RL, SoundCategory.HOSTILE, 0, -999999999, 0);
+        soundHandler.playSound(alertSound);
+        soundHandler.stopSound(alertSound);
+        soundHandler.playSound(heartbeatSound);
+        soundHandler.stopSound(heartbeatSound);
+        alertSound = null;
+        heartbeatSound = null;
     }
 
     @SubscribeEvent
