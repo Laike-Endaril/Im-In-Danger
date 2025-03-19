@@ -253,7 +253,8 @@ public class ImInDanger
 
                 GlStateManager.color(1, 1, 1, alpha);
 
-                GlStateManager.translate(8 + (sr.getScaledWidth() - 16) * DangerConfig.visualSettings.dangerIndicatorXPosition, 8 + (sr.getScaledHeight() - 16) * DangerConfig.visualSettings.dangerIndicatorYPosition, 0);
+                float size = (float) (16 * DangerConfig.visualSettings.dangerIndicatorScale), halfSize = size * 0.5f;
+                GlStateManager.translate(halfSize + (sr.getScaledWidth() - size) * DangerConfig.visualSettings.dangerIndicatorXPosition, halfSize + (sr.getScaledHeight() - size) * DangerConfig.visualSettings.dangerIndicatorYPosition, 0);
 
                 float uvleft = 0;
                 float uvright = 1;
@@ -264,13 +265,13 @@ public class ImInDanger
 
                 GlStateManager.glBegin(GL_QUADS);
                 GlStateManager.glTexCoord2f(uvleft, uvtop);
-                GlStateManager.glVertex3f(-8, -8, 0);
+                GlStateManager.glVertex3f(-halfSize, -halfSize, 0);
                 GlStateManager.glTexCoord2f(uvleft, uvbottom);
-                GlStateManager.glVertex3f(-8, 8, 0);
+                GlStateManager.glVertex3f(-halfSize, halfSize, 0);
                 GlStateManager.glTexCoord2f(uvright, uvbottom);
-                GlStateManager.glVertex3f(8, 8, 0);
+                GlStateManager.glVertex3f(halfSize, halfSize, 0);
                 GlStateManager.glTexCoord2f(uvright, uvtop);
-                GlStateManager.glVertex3f(8, -8, 0);
+                GlStateManager.glVertex3f(halfSize, -halfSize, 0);
                 GlStateManager.glEnd();
 
                 GlStateManager.color(1, 1, 1, 1);

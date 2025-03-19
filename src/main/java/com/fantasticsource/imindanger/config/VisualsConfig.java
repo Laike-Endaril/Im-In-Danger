@@ -51,4 +51,14 @@ public class VisualsConfig
             })
     @Config.RangeDouble(min = 0, max = 1)
     public double dangerIndicatorYPosition = 0.8;
+
+    @Config.Name("050 Danger Indicator Scale")
+    @Config.LangKey(ImInDanger.MODID + ".config.visuals.dangerIndicatorScale")
+    @Config.Comment(
+            {
+                    "The damage indicator size is multiplied by this amount",
+                    "Note that render size has nothing to do with original image file dimensions (but image quality does)"
+            })
+    @Config.RangeDouble(min = 0)
+    public double dangerIndicatorScale = 1;
 }
