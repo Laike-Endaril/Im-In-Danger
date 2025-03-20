@@ -65,7 +65,7 @@ public class ImInDanger
 
     public static boolean clientInDanger = false;
 
-    public static long lastDangerStartTime = 0, lastDangerEndTime = 0, lastAlarmTime = 0, lastIntensity0ToNon0Time = 0;
+    public static long lastDangerStartTime = 0, lastDangerEndTime = 0, lastAlarmTime = 0, lastIntensity0ToNon0Time = 0, lastIntensityNon0To0Time = 0;
     public static float lastTickIntensity = 0;
 
 
@@ -89,6 +89,13 @@ public class ImInDanger
         {
             config.getCategory("general").get("040 Danger Fade-Out Time").set(category.get("020 Danger Indicator Fade Time").getInt());
             category.remove("020 Danger Indicator Fade Time");
+            changed = true;
+        }
+        category = config.getCategory("general.sound");
+        if (category.containsKey("015 Minimum Time Between Alarms"))
+        {
+            category.get("015 Minimum Calm Before Alarm").set(category.get("015 Minimum Time Between Alarms").getInt());
+            category.remove("015 Minimum Time Between Alarms");
             changed = true;
         }
         if (changed)
@@ -223,7 +230,7 @@ public class ImInDanger
                 //"Alert" trigger (client)
                 lastDangerStartTime = System.currentTimeMillis();
 
-                if (!soundHandler.isSoundPlaying(alertSound) && lastTickIntensity == 0 && System.currentTimeMillis() - lastAlarmTime >= DangerConfig.soundSettings.minTimeBetweenAlarms)
+                if (!soundHandler.isSoundPlaying(alertSound) && lastTickIntensity == 0 && System.currentTimeMillis() - lastIntensityNon0To0Time >= DangerConfig.soundSettings.minCalmBeforeAlarm)
                 {
                     alertSound.volume = 1;
                     soundHandler.playSound(alertSound);
@@ -259,6 +266,7 @@ public class ImInDanger
             lastTickIntensity = 0;
             lastAlarmTime = 0;
             lastIntensity0ToNon0Time = 0;
+            lastIntensityNon0To0Time = 0;
 
             lastTickIntensity = 0;
 
@@ -278,7 +286,14 @@ public class ImInDanger
 
             boolean lastWas0 = lastTickIntensity == 0;
             lastTickIntensity = currentDangerIntensity();
-            if (lastWas0 && lastTickIntensity != 0) lastIntensity0ToNon0Time = System.currentTimeMillis();
+            if (lastWas0)
+            {
+                if (lastTickIntensity != 0) lastIntensity0ToNon0Time = System.currentTimeMillis();
+            }
+            else
+            {
+                if (lastTickIntensity == 0) lastIntensityNon0To0Time = System.currentTimeMillis();
+            }
 
             alertSound.volume = (float) DangerConfig.soundSettings.alertVolume;
 

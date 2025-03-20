@@ -14,14 +14,14 @@ public class SoundConfig
     @Config.RangeDouble(min = 0, max = 1)
     public double alertVolume = 1;
 
-    @Config.Name("015 Minimum Time Between Alarms")
-    @Config.LangKey(ImInDanger.MODID + ".config.sound.minTimeBetweenAlarms")
+    @Config.Name("015 Minimum Calm Before Alarm")
+    @Config.LangKey(ImInDanger.MODID + ".config.sound.minCalmBeforeAlarm")
     @Config.Comment(
             {
-                    "After the alarm sound plays, at least this much time needs to go by before it can play again, in milliseconds (1000 = 1 second)"
+                    "At least this much time needs to go by without any danger before the alarm can play (except when first joining), in milliseconds (1000 = 1 second)"
             })
     @Config.RangeInt(min = 0)
-    public int minTimeBetweenAlarms = 3000;
+    public int minCalmBeforeAlarm = 3000;
 
 
     @Config.Name("020 Heartbeat Volume")
