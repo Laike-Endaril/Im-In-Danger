@@ -78,18 +78,24 @@ public class ImInDanger
         category.remove("050 Danger Smoothing");
         category.remove("050 Danger Smoothing Fade");
         category = config.getCategory("general.visuals");
+        boolean changed = false;
         if (category.containsKey("017 Danger Indicator Fade-In Time"))
         {
             config.getCategory("general").get("030 Danger Fade-In Time").set(category.get("017 Danger Indicator Fade-In Time").getInt());
             category.remove("017 Danger Indicator Fade-In Time");
+            changed = true;
         }
         if (category.containsKey("020 Danger Indicator Fade Time"))
         {
             config.getCategory("general").get("040 Danger Fade-Out Time").set(category.get("020 Danger Indicator Fade Time").getInt());
             category.remove("020 Danger Indicator Fade Time");
+            changed = true;
         }
-        config.save();
-        MCTools.reloadConfig(configFile.getAbsolutePath(), MODID);
+        if (changed)
+        {
+            config.save();
+            MCTools.reloadConfig(configFile.getAbsolutePath(), MODID);
+        }
 
 
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
