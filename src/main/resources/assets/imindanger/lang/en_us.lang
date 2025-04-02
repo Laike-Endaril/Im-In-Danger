@@ -3,6 +3,17 @@ imindanger.subtitles.heartbeat=Heartbeat
 
 
 
+imindanger.dangersense=Dangersense
+potion.effect.imindanger.dangersense=Potion of Dangersense
+potion.effect.imindanger.long_dangersense=Potion of Long Dangersense
+splash_potion.effect.imindanger.dangersense=Splash Potion of Dangersense
+splash_potion.effect.imindanger.long_dangersense=Splash Potion of Long Dangersense
+lingering_potion.effect.imindanger.dangersense=Lingering Potion of Dangersense
+lingering_potion.effect.imindanger.long_dangersense=Lingering Potion of Long Dangersense
+tipped_arrow.effect.imindanger.dangersense=Arrow of Dangersense
+tipped_arrow.effect.imindanger.long_dangersense=Arrow of Long Dangersense
+
+
 
 imindanger.config.server=Server
 imindanger.config.sound=Sound

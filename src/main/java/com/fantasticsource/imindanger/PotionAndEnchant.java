@@ -14,7 +14,7 @@ import static com.fantasticsource.imindanger.ImInDanger.MODID;
 public class PotionAndEnchant
 {
     public static BetterPotion potionDangersense = null;
-    public static BetterPotionType potionTypeDangersense = null;
+    public static BetterPotionType potionTypeDangersense = null, potionTypeLongDangersense = null;
 
     public static void init()
     {
@@ -23,6 +23,7 @@ public class PotionAndEnchant
             case 1:
                 potionDangersense = new BetterPotion(new ResourceLocation(MODID, "dangersense"), new ResourceLocation(MODID, "potions/dangersense.png"), false, false, 0xBB7755);
                 potionTypeDangersense = new BetterPotionType(PotionTypes.THICK, new ItemStack(Items.SPIDER_EYE), new FantasticPotionEffect(potionDangersense, 3600));
+                potionTypeLongDangersense = potionTypeDangersense.getLongDurationVersion();
                 break;
 
             case 2:
@@ -31,6 +32,7 @@ public class PotionAndEnchant
             case 3:
                 potionDangersense = new BetterPotion(new ResourceLocation(MODID, "dangersense"), new ResourceLocation(MODID, "potions/dangersense.png"), false, false, 0xBB7755);
                 potionTypeDangersense = new BetterPotionType(PotionTypes.THICK, new ItemStack(Items.SPIDER_EYE), new FantasticPotionEffect(potionDangersense, 3600));
+                potionTypeLongDangersense = potionTypeDangersense.getLongDurationVersion();
                 break;
         }
     }
