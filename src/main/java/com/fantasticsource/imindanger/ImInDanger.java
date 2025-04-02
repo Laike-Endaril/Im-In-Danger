@@ -107,6 +107,7 @@ public class ImInDanger
 
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
         Network.init();
+        PotionAndEnchant.init();
     }
 
     @SideOnly(Side.CLIENT)
@@ -179,11 +180,34 @@ public class ImInDanger
                     EntityPlayerMP player = (EntityPlayerMP) target;
                     if (!inDangerPlayersNew.contains(player))
                     {
-                        inDangerPlayersNew.add(player);
-                        if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker)))
+                        //Conditions for having dangersense
+                        boolean hasDangersense = false;
+                        switch (DangerConfig.dangersenseMode)
                         {
-                            //"Alert" trigger (server)
-                            Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
+                            case 0:
+                                hasDangersense = true;
+                                break;
+
+                            case 1:
+                                hasDangersense = player.getActivePotionEffect(PotionAndEnchant.potionDangersense) != null;
+                                break;
+
+                            case 2:
+                                break;
+
+                            case 3:
+                                hasDangersense = player.getActivePotionEffect(PotionAndEnchant.potionDangersense) != null;
+                                break;
+                        }
+
+                        if (hasDangersense)
+                        {
+                            inDangerPlayersNew.add(player);
+                            if (!inDangerPlayers.contains(player) && !MinecraftForge.EVENT_BUS.post(new DangerEvent((EntityPlayerMP) target, attacker)))
+                            {
+                                //"Alert" trigger (server)
+                                Network.WRAPPER.sendTo(new Network.DangerPacket(true), player);
+                            }
                         }
                     }
                 }

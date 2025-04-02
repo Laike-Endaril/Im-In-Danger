@@ -7,6 +7,8 @@ imindanger.subtitles.heartbeat=Heartbeat
 imindanger.config.server=Server
 imindanger.config.sound=Sound
 imindanger.config.visuals=Visuals
+imindanger.config.dangersenseMode=Dangersense Mode
+imindanger.config.dangersenseMode.tooltip=How players can obtain dangersense\nClients must have the same setting as the server in order to function correctly!\n\n0 = Players always have dangersense\n\n1 = Players have dangersense when using a dangersense potion (adds potion items to the world!)\n\n2 = Players have dangersense when using a dangersense enchantment (adds enchantment to the world!)\n\n3 = Players have dangersense when using a dangersense potion or enchantment (adds potion items and an enchantment to the world!)\n \n
 imindanger.config.dangerFadeInTime=Danger Fade-In Time
 imindanger.config.dangerFadeInTime.tooltip=How long the danger indicator and heartbeat take to fade in when danger is detected, in milliseconds (1000 = 1 second)
 imindanger.config.dangerFadeOutTime=Danger Fade-Out Time
