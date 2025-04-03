@@ -1,6 +1,7 @@
 package com.fantasticsource.imindanger;
 
 import com.fantasticsource.imindanger.config.DangerConfig;
+import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Render;
 import com.fantasticsource.mctools.sound.SimpleSound;
@@ -9,11 +10,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 
-@Mod(modid = ImInDanger.MODID, name = ImInDanger.NAME, version = ImInDanger.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.051,)")
+@Mod(modid = ImInDanger.MODID, name = ImInDanger.NAME, version = ImInDanger.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.056,)")
 public class ImInDanger
 {
     public static final String MODID = "imindanger";
@@ -107,7 +110,8 @@ public class ImInDanger
 
         MinecraftForge.EVENT_BUS.register(ImInDanger.class);
         Network.init();
-        PotionAndEnchant.init();
+        Potions.init();
+        EnchantmentDangersense.init();
     }
 
     @SideOnly(Side.CLIENT)
@@ -189,14 +193,26 @@ public class ImInDanger
                                 break;
 
                             case 1:
-                                hasDangersense = player.getActivePotionEffect(PotionAndEnchant.potionDangersense) != null;
+                                hasDangersense = player.getActivePotionEffect(Potions.potionDangersense) != null;
                                 break;
 
                             case 2:
+                                hasDangersense = !EnchantmentHelper.getEnchantedItem(EnchantmentDangersense.enchantmentDangersense, player).isEmpty();
                                 break;
 
                             case 3:
-                                hasDangersense = player.getActivePotionEffect(PotionAndEnchant.potionDangersense) != null;
+                                if (player.getActivePotionEffect(Potions.potionDangersense) != null) hasDangersense = true;
+                                else
+                                {
+                                    for (ItemStack stack : GlobalInventory.getValidEquippedItems(player))
+                                    {
+                                        if (EnchantmentHelper.getEnchantments(stack).keySet().contains(EnchantmentDangersense.enchantmentDangersense))
+                                        {
+                                            hasDangersense = true;
+                                            break;
+                                        }
+                                    }
+                                }
                                 break;
                         }
 
